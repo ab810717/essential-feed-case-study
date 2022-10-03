@@ -59,7 +59,6 @@ class RemoteFeedLoaderTests: XCTestCase {
             let invalidJSON = Data("invalid json".utf8)
             client.complete(withStatusCode: 200, data: invalidJSON)
         }
-        
     }
     
     // MARK: - Helpers
@@ -70,10 +69,10 @@ class RemoteFeedLoaderTests: XCTestCase {
     }
     
     private func expect(_ sut: RemoteFeedloader, toCompletewithError error: RemoteFeedloader.Error, file: StaticString = #filePath, line:UInt = #line ,when action: () -> Void) {
-        var capturedeErrors = [RemoteFeedloader.Error]()
-        sut.load { capturedeErrors.append($0)}
+        var capturedResult = [RemoteFeedloader.Result]()
+        sut.load { capturedResult.append($0)}
         action()
-        XCTAssertEqual(capturedeErrors, [error], file: file, line: line)
+        XCTAssertEqual(capturedResult, [.failure(error)], file: file, line: line)
     }
     
     private class HTTPClientSpy: HTTPClient {

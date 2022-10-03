@@ -10,6 +10,7 @@ public enum HTTPClientResult {
     case succses(Data, HTTPURLResponse)
     case failure(Error)
 }
+
 public protocol HTTPClient {
     func get(from url: URL, completion: @escaping (HTTPClientResult) -> Void)
 }
@@ -23,18 +24,24 @@ public class RemoteFeedloader {
         case invalidData
     }
     
+    public enum Result: Equatable {
+        case succcess([FeedItem])
+        case failure(Error)
+    }
+
+    
     public init(url: URL, client: HTTPClient) {
         self.url = url
         self.client = client
     }
     
-    public func load(completion: @escaping (Error) -> Void) {
+    public func load(completion: @escaping (Result) -> Void) {
         client.get(from: url) { result  in
             switch result {
             case .succses:
-                completion(.invalidData)
+                completion(.failure(.invalidData))
             case .failure:
-                completion(.connetivity)
+                completion(.failure(.connetivity))
             }
             
         }
