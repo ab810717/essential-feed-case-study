@@ -30,11 +30,11 @@ class RemoteFeedLoaderTests: XCTestCase {
         sut.load{ _ in }
         sut.load{ _ in }
         XCTAssertEqual(client.requestedURLs, [url,url])
-    }
+    } 
     
     func test_load_deliversErrorOnClientError() {
         let (sut, clinet) = makeSUT()
-        expect(sut, toCompletewith: .failure(.connetivity)) {
+        expect(sut, toCompletewith: .failure(RemoteFeedloader.Error.connetivity)) {
             let clientError = NSError(domain: "Test", code: 0)
             clinet.complete(with: clientError)
         }
@@ -47,7 +47,7 @@ class RemoteFeedLoaderTests: XCTestCase {
         let samples = [199, 201, 300, 400, 500]
         
         samples.enumerated().forEach{ index, code in
-            expect(sut, toCompletewith: .failure(.invalidData)) {
+            expect(sut, toCompletewith: .failure(RemoteFeedloader.Error.invalidData)) {
                 let json = makeItemsJSON([])
                 clinet.complete(withStatusCode: code, data: json, at: index)
             }
@@ -56,7 +56,7 @@ class RemoteFeedLoaderTests: XCTestCase {
     
     func test_load_deliversErrorOn200HTTPResponseWithInvalidJson() {
         let (sut, client) = makeSUT()
-        expect(sut, toCompletewith: .failure(.invalidData)) {
+        expect(sut, toCompletewith: .failure(RemoteFeedloader.Error.invalidData)) {
             let invalidJSON = Data("invalid json".utf8)
             client.complete(withStatusCode: 200, data: invalidJSON)
         }
@@ -64,7 +64,7 @@ class RemoteFeedLoaderTests: XCTestCase {
     
     func test_load_deliversNoItemsOn200HTTPResponseWithEmptyJSONList() {
         let (sut, client) = makeSUT()
-        expect(sut, toCompletewith: .succcess([])) {
+        expect(sut, toCompletewith: .success([])) {
             let emptyListJSON = makeItemsJSON([])
             client.complete(withStatusCode: 200, data: emptyListJSON)
         }
@@ -84,7 +84,7 @@ class RemoteFeedLoaderTests: XCTestCase {
        
         let items = [item1.model, item2.model]
         
-        expect(sut, toCompletewith: .succcess(items), when: {
+        expect(sut, toCompletewith: .success(items), when: {
             let json = makeItemsJSON([item1.json, item2.json])
             client.complete(withStatusCode: 200, data: json)
         })
