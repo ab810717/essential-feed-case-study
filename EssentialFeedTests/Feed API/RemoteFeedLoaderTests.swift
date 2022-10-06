@@ -34,7 +34,7 @@ class RemoteFeedLoaderTests: XCTestCase {
     
     func test_load_deliversErrorOnClientError() {
         let (sut, clinet) = makeSUT()
-        expect(sut, toCompletewith: .failure(RemoteFeedloader.Error.connetivity)) {
+        expect(sut, toCompletewith: failure(.connetivity)) {
             let clientError = NSError(domain: "Test", code: 0)
             clinet.complete(with: clientError)
         }
@@ -47,7 +47,7 @@ class RemoteFeedLoaderTests: XCTestCase {
         let samples = [199, 201, 300, 400, 500]
         
         samples.enumerated().forEach{ index, code in
-            expect(sut, toCompletewith: .failure(RemoteFeedloader.Error.invalidData)) {
+            expect(sut, toCompletewith: failure(.invalidData)) {
                 let json = makeItemsJSON([])
                 clinet.complete(withStatusCode: code, data: json, at: index)
             }
@@ -56,7 +56,7 @@ class RemoteFeedLoaderTests: XCTestCase {
     
     func test_load_deliversErrorOn200HTTPResponseWithInvalidJson() {
         let (sut, client) = makeSUT()
-        expect(sut, toCompletewith: .failure(RemoteFeedloader.Error.invalidData)) {
+        expect(sut, toCompletewith: failure(.invalidData)) {
             let invalidJSON = Data("invalid json".utf8)
             client.complete(withStatusCode: 200, data: invalidJSON)
         }
@@ -113,6 +113,9 @@ class RemoteFeedLoaderTests: XCTestCase {
         return (sut,client)
     }
     
+    private func failure(_ error: RemoteFeedloader.Error) -> RemoteFeedloader.Result {
+        return .failure(error)
+    }
     private func trackForMemoryLeaks(_ instance: AnyObject, file: StaticString = #filePath, line:UInt = #line) {
         addTeardownBlock { [weak instance] in
             XCTAssertNil(instance, "Instance should have been deallocated. Potential memory leak.", file: file, line: line)
