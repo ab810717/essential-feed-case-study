@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class RemoteFeedloader {
+public class RemoteFeedloader: FeedLoader {
     private let url: URL
     private let client: HTTPClient
     
@@ -23,6 +23,7 @@ public class RemoteFeedloader {
         self.url = url
         self.client = client
     }
+    
     
     public func load(completion: @escaping (Result) -> Void) {
         client.get(from: url) { [weak self] result in
